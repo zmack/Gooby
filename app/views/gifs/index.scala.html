@@ -1,0 +1,15 @@
+@(gifs: List[models.Image])
+
+@import helper._
+
+@main("These are your gifs") {
+    <h1>@gifs.size() gifs</h1>
+    <ul>
+        @for(gif <- gifs) {
+            <li>
+                <p>@gif.getName()</p>
+                <span>@gif.getDownloads() downloads</span>
+            </li>
+        }
+    </ul>
+}
