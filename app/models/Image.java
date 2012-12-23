@@ -2,8 +2,10 @@ package models;
 
 import java.util.ArrayList;
 import java.util.List;
+import play.data.validation.Constraints.*;
 
 public class Image {
+    @Required
     private String name;
     private Integer downloads;
 
@@ -15,6 +17,13 @@ public class Image {
         }
 
         return list;
+    }
+
+    public static Image create() {
+        return new Image();
+    }
+
+    public Image() {
     }
 
     public Image(String name, Integer downloads) {

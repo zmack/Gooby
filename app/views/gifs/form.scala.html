@@ -1,1 +1,11 @@
+@(imageForm: Form[Image])
+
+@import helper._
+
+@main("Add an image") {
+    @helper.form(routes.Gif.create()) {
+        @inputText(imageForm("name"))
+        <input type="submit" value="Create" />
+    }
+}
 <h1>I hate everything</h1>
