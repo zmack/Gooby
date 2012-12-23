@@ -23,6 +23,10 @@ public class Image {
         return new Image();
     }
 
+    public static Image getById(Long id) {
+        return new Image("<script>alert('Hello')</script>", 0);
+    }
+
     public Image() {
     }
 

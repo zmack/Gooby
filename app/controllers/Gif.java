@@ -32,6 +32,7 @@ public class Gif extends Controller {
     }
 
     public static Result show(Long id) {
-        return TODO;
+        Image image = Image.getById(id);
+        return ok(views.html.gifs.show.render(image));
     }
 }
