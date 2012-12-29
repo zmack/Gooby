@@ -1,5 +1,6 @@
 package models;
 
+import play.Logger;
 import play.data.validation.Constraints;
 import play.db.ebean.Model;
 import play.mvc.Http.MultipartFormData.FilePart;
@@ -44,7 +45,7 @@ public class Image extends Model {
     }
 
     public static Image getById(Long id) {
-        return new Image("<script>alert('Hello')</script>", 0);
+        return Image.find.byId(id);
     }
 
     public Image() {
@@ -69,7 +70,13 @@ public class Image extends Model {
 
         File attachedFile = imageFile.getFile();
         File destinationFile = path.toFile();
-        attachedFile.renameTo(destinationFile);
+
+        if (attachedFile.renameTo(destinationFile)) {
+            Logger.info("This worked");
+        } else {
+            Logger.info("This did not work");
+        }
+
         this.mimeType = imageFile.getContentType();
         this.filePath = path.toString();
         return destinationFile;
@@ -85,5 +92,10 @@ public class Image extends Model {
 
     public String getMimeType() {
         return mimeType;
+    }
+
+    public File getAttachedFile() {
+        Logger.info(this.filePath);
+        return new File(this.filePath);
     }
 }

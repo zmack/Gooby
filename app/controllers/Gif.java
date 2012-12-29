@@ -44,4 +44,9 @@ public class Gif extends Controller {
         Image image = Image.getById(id);
         return ok(views.html.gifs.show.render(image));
     }
+
+    public static Result getImage(Long id) {
+        Image image = Image.getById(id);
+        return ok(image.getAttachedFile()).as(image.getMimeType());
+    }
 }

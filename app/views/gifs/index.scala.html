@@ -6,11 +6,11 @@
     <h1>@gifs.size() gifs</h1>
     <ul>
         @for(gif <- gifs) {
-            <li>
-                <p><em>Name</em>: @gif.getName()</p>
-                <p><em>Path</em>: @gif.getFilePath()</p>
-                <p><em>Mime-type</em>: @gif.getMimeType()</p>
-                <span>@gif.getDownloads() downloads</span>
+            <li data-id="@gif.id">
+                <p><em>Name</em>: @gif.getName</p>
+                <p><em>Path</em>: @gif.getFilePath</p>
+                <p><em>Mime-type</em>: @gif.getMimeType</p>
+                <span>@gif.getDownloads downloads</span>
             </li>
         }
     </ul>
