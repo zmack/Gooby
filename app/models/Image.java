@@ -1,13 +1,29 @@
 package models;
 
+import javax.persistence.*;
+
+import java.lang.Long;
 import java.util.ArrayList;
 import java.util.List;
-import play.data.validation.Constraints.*;
 
-public class Image {
-    @Required
-    private String name;
+import play.data.validation.Constraints.*;
+import play.db.ebean.*;
+import play.data.format.*;
+import play.data.validation.*;
+import play.db.ebean.Model;
+
+@Entity
+public class Image extends Model {
+
+    @Id
+    @Constraints.Min(10)
+    public Long id;
+
+    @Constraints.Required
+    public String name;
+
     private Integer downloads;
+    public static Finder<Long,Image> find = new Finder<Long, Image>(Long.class, Image.class);
 
     public static List<Image> getAll() {
         List<Image> list = new ArrayList<Image>(20);

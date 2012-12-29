@@ -1,6 +1,7 @@
 package controllers;
 
 import models.Image;
+import play.Logger;
 import play.mvc.*;
 import play.data.*;
 import views.html.gifs.*;
@@ -11,18 +12,21 @@ public class Gif extends Controller {
     static Form<Image> imageForm = form(Image.class);
 
     public static Result index() {
-        List<Image> imageList = Image.getAll();
+        List<Image> imageList = Image.find.all();
         return ok(index.render(imageList));
     }
 
     public static Result create() {
         Form<Image> filledForm = imageForm.bindFromRequest();
+        Image image;
         if (filledForm.hasErrors()) {
             return badRequest(
                     views.html.gifs.form.render(filledForm)
             );
         } else {
-            filledForm.get();
+            image = filledForm.get();
+
+            image.save();
             return redirect(routes.Gif.index());
         }
     }
