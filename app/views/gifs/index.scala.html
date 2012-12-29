@@ -7,7 +7,9 @@
     <ul>
         @for(gif <- gifs) {
             <li>
-                <p>@gif.getName()</p>
+                <p><em>Name</em>: @gif.getName()</p>
+                <p><em>Path</em>: @gif.getFilePath()</p>
+                <p><em>Mime-type</em>: @gif.getMimeType()</p>
                 <span>@gif.getDownloads() downloads</span>
             </li>
         }

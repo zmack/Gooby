@@ -1,10 +1,12 @@
 package controllers;
 
 import models.Image;
-import play.Logger;
-import play.mvc.*;
-import play.data.*;
-import views.html.gifs.*;
+import play.data.Form;
+import play.mvc.Controller;
+import play.mvc.Http.MultipartFormData;
+import play.mvc.Http.MultipartFormData.FilePart;
+import play.mvc.Result;
+import views.html.gifs.index;
 
 import java.util.List;
 
@@ -17,15 +19,18 @@ public class Gif extends Controller {
     }
 
     public static Result create() {
+        MultipartFormData body = request().body().asMultipartFormData();
+        FilePart imageFile = body.getFile("image_file");
         Form<Image> filledForm = imageForm.bindFromRequest();
         Image image;
+
         if (filledForm.hasErrors()) {
             return badRequest(
                     views.html.gifs.form.render(filledForm)
             );
         } else {
             image = filledForm.get();
-
+            image.addAttachedFile(imageFile);
             image.save();
             return redirect(routes.Gif.index());
         }

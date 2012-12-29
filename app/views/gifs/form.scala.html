@@ -3,8 +3,9 @@
 @import helper._
 
 @main("Add an image") {
-    @helper.form(routes.Gif.create()) {
+    @helper.form(routes.Gif.create(), 'enctype -> "multipart/form-data") {
         @inputText(imageForm("name"))
+        <input type="file" name="image_file"/>
         <input type="submit" value="Create" />
     }
 }

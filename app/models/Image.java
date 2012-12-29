@@ -1,16 +1,17 @@
 package models;
 
-import javax.persistence.*;
+import play.data.validation.Constraints;
+import play.db.ebean.Model;
+import play.mvc.Http.MultipartFormData.FilePart;
 
-import java.lang.Long;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-
-import play.data.validation.Constraints.*;
-import play.db.ebean.*;
-import play.data.format.*;
-import play.data.validation.*;
-import play.db.ebean.Model;
+import java.util.UUID;
 
 @Entity
 public class Image extends Model {
@@ -21,6 +22,9 @@ public class Image extends Model {
 
     @Constraints.Required
     public String name;
+
+    private String filePath;
+    private String mimeType;
 
     private Integer downloads;
     public static Finder<Long,Image> find = new Finder<Long, Image>(Long.class, Image.class);
@@ -44,11 +48,31 @@ public class Image extends Model {
     }
 
     public Image() {
+        this.downloads = 0;
     }
 
     public Image(String name, Integer downloads) {
         this.name = name;
         this.downloads = downloads;
+    }
+
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public File addAttachedFile(FilePart imageFile) {
+        if (imageFile == null) {
+            return null;
+        }
+
+        Path path = Paths.get("/tmp/gooby", UUID.randomUUID().toString());
+
+        File attachedFile = imageFile.getFile();
+        File destinationFile = path.toFile();
+        attachedFile.renameTo(destinationFile);
+        this.mimeType = imageFile.getContentType();
+        this.filePath = path.toString();
+        return destinationFile;
     }
 
     public String getName() {
@@ -57,5 +81,9 @@ public class Image extends Model {
 
     public Integer getDownloads() {
         return downloads;
+    }
+
+    public String getMimeType() {
+        return mimeType;
     }
 }
