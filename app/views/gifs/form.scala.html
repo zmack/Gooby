@@ -5,7 +5,15 @@
 @main("Add an image") {
     @helper.form(routes.Gif.create(), 'enctype -> "multipart/form-data") {
         @inputText(imageForm("name"))
-        <input type="file" name="image_file"/>
+        <label>
+            Image Url:
+            <input type="text" name="image_url" />
+        </label>
+        <label>
+            Image File:
+            <input type="file" name="image_file" />
+        </label>
+
         <input type="submit" value="Create" />
     }
 }
