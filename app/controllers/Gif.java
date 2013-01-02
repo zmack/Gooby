@@ -2,10 +2,9 @@ package controllers;
 
 import models.Image;
 import play.Logger;
-import play.api.libs.concurrent.Promise;
-import play.api.libs.ws.Response;
-import play.api.libs.ws.WS;
 import play.data.Form;
+import play.libs.F;
+import play.libs.WS;
 import play.mvc.Controller;
 import play.mvc.Http.MultipartFormData;
 import play.mvc.Http.MultipartFormData.FilePart;
@@ -59,15 +58,17 @@ public class Gif extends Controller {
         if (imageUrl == null) {
             image.save();
         } else {
-            WS.WSRequestHolder request = WS.url(imageUrl);
-            Promise<Result> result = request.get().map(new scala.runtime.AbstractFunction1<Response, Result>() {
-                public Result apply(Response response) {
-                    Logger.info(response.body());
-                    return ok("Hello world");
-                }
-            });
-
-            return result.await(1000, TimeUnit.SECONDS).get();
+            F.Promise<Result> result = WS.url(imageUrl).get().map(
+                    new F.Function<WS.Response, Result>() {
+                        @Override
+                        public Result apply(WS.Response response) throws Throwable {
+                            Logger.info(response.getBody());
+                            return ok("Hello world");
+                        }
+                    }
+            );
+            async(result);
+            return result.get(1000L, TimeUnit.SECONDS);
         }
 
         return redirect(routes.Gif.index());

@@ -1,5 +1,4 @@
 import sbt._
-import Keys._
 import PlayProject._
 
 object ApplicationBuild extends Build {
