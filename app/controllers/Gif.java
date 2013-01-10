@@ -54,7 +54,7 @@ public class Gif extends Controller {
         return ok(image.getAttachedFile()).as(image.getMimeType());
     }
 
-    private static Result saveImageAsync(Image image, String imageUrl) {
+    private static Result saveImageAsync(final Image image, String imageUrl) {
         if (imageUrl == null) {
             image.save();
         } else {
@@ -62,7 +62,8 @@ public class Gif extends Controller {
                     new F.Function<WS.Response, Result>() {
                         @Override
                         public Result apply(WS.Response response) throws Throwable {
-                            Logger.info(response.getBody());
+                            image.setAttachedFileContent(response.getBody(),response.getHeader("Content-Type"));
+                            image.save();
                             return ok("Hello world");
                         }
                     }

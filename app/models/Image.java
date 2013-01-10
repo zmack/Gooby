@@ -7,7 +7,11 @@ import play.mvc.Http.MultipartFormData.FilePart;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import java.io.File;
+import java.io.*;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -61,6 +65,23 @@ public class Image extends Model {
         return filePath;
     }
 
+    public Boolean setAttachedFileContent(String fileContent, String contentType) throws IOException {
+        Path path = getFileTempPath();
+        BufferedWriter writer = Files.newBufferedWriter(path, Charset.forName("US-ASCII"));
+
+        try {
+            writer.write(fileContent);
+        } catch(IOException e) {
+
+        } finally {
+            writer.close();
+        }
+
+        this.mimeType = contentType;
+        this.filePath = path.toString();
+        return true;
+    }
+
     public File addAttachedFile(FilePart imageFile) {
         if (imageFile == null) {
             return null;
@@ -100,6 +121,6 @@ public class Image extends Model {
     }
 
     private Path getFileTempPath() {
-        return Paths.get("/tmp/gooby", UUID.randomUUID().toString());
+        return Paths.get(System.getProperty("user.dir"), "tmp", "gooby", UUID.randomUUID().toString());
     }
 }
