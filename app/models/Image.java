@@ -65,18 +65,28 @@ public class Image extends Model {
         return filePath;
     }
 
-    public Boolean setAttachedFileContent(String fileContent, String contentType) throws IOException {
+    public boolean setAttachedFileContentAsBytes(byte[] fileContent, String contentType) throws IOException {
         Path path = getFileTempPath();
-        BufferedWriter writer = Files.newBufferedWriter(path, Charset.forName("US-ASCII"));
 
         try {
-            writer.write(fileContent);
+            Files.write(path, fileContent);
         } catch(IOException e) {
 
         } finally {
-            writer.close();
         }
+        this.mimeType = contentType;
+        this.filePath = path.toString();
+        return true;
+    }
+    public Boolean setAttachedFileContent(String fileContent, String contentType) throws IOException {
+        Path path = getFileTempPath();
 
+        try {
+            Files.write(path, fileContent.getBytes());
+        } catch(IOException e) {
+
+        } finally {
+        }
         this.mimeType = contentType;
         this.filePath = path.toString();
         return true;

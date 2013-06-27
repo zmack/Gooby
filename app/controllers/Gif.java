@@ -1,24 +1,25 @@
 package controllers;
 
 import models.Image;
-import play.Logger;
+import play.*;
 import play.data.Form;
+import static play.data.Form.*;
 import play.libs.F;
 import play.libs.WS;
-import play.mvc.Controller;
+import play.mvc.*;
 import play.mvc.Http.MultipartFormData;
 import play.mvc.Http.MultipartFormData.FilePart;
-import play.mvc.Result;
 import views.html.gifs.index;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class Gif extends Controller {
-    static Form<Image> imageForm = form(Image.class);
+    public static Form<Image> imageForm = form(Image.class);
 
     public static Result index() {
         List<Image> imageList = Image.find.all();
+
         return ok(index.render(imageList));
     }
 
@@ -55,6 +56,7 @@ public class Gif extends Controller {
     }
 
     private static Result saveImageAsync(final Image image, String imageUrl) {
+        Logger.info(imageUrl);
         if (imageUrl == null) {
             image.save();
         } else {
@@ -62,14 +64,13 @@ public class Gif extends Controller {
                     new F.Function<WS.Response, Result>() {
                         @Override
                         public Result apply(WS.Response response) throws Throwable {
-                            image.setAttachedFileContent(response.getBody(),response.getHeader("Content-Type"));
+                            image.setAttachedFileContentAsBytes(response.asByteArray(),response.getHeader("Content-Type"));
                             image.save();
                             return ok("Hello world");
                         }
                     }
             );
-            async(result);
-            return result.get(1000L, TimeUnit.SECONDS);
+            return async(result);
         }
 
         return redirect(routes.Gif.index());

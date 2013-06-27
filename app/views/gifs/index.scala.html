@@ -1,9 +1,9 @@
-@(gifs: List[models.Image])
+@(gifs: java.util.List[models.Image])
 
 @import helper._
 
 @main("These are your gifs") {
-    <h1>@gifs.size() gifs</h1>
+    <h1>@gifs.size gifs</h1>
     <ul>
         @for(gif <- gifs) {
             <li data-id="@gif.id">
