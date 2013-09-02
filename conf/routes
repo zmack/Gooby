@@ -3,12 +3,13 @@
 # ~~~~
 
 # Home page
-GET     /                           controllers.Application.index()
+GET     /                           controllers.Gif.index()
 GET     /gifs                       controllers.Gif.index()
 GET     /gifs/new                   controllers.Gif.newGif()
 POST    /gifs                       controllers.Gif.create()
 GET     /gifs/:id                   controllers.Gif.show(id: Long)
 GET     /gifs/:id/download          controllers.Gif.getImage(id: Long)
+GET     /gifs/:id/thumbnail         controllers.Gif.getImageThumbnail(id: Long)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

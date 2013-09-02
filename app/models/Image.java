@@ -5,8 +5,10 @@ import play.data.validation.Constraints;
 import play.db.ebean.Model;
 import play.mvc.Http.MultipartFormData.FilePart;
 
+import javax.imageio.ImageIO;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
@@ -17,6 +19,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import org.imgscalr.Scalr;
 
 @Entity
 public class Image extends Model {
@@ -78,6 +81,7 @@ public class Image extends Model {
         this.filePath = path.toString();
         return true;
     }
+
     public Boolean setAttachedFileContent(String fileContent, String contentType) throws IOException {
         Path path = getFileTempPath();
 
@@ -121,13 +125,33 @@ public class Image extends Model {
         return downloads;
     }
 
+    public void generateThumbnail() {
+        try {
+            final BufferedImage source = ImageIO.read(getAttachedFile());
+            final BufferedImage resized = Scalr.resize(
+                    source, Scalr.Mode.FIT_TO_WIDTH, 200, Scalr.OP_ANTIALIAS, Scalr.OP_BRIGHTER);
+            ImageIO.write(resized, "jpeg", getAttachedFileThumbnail());
+
+        } catch(IOException exception) {
+            Logger.error("Could not get a valid image up in here");
+        }
+    }
+
+
     public String getMimeType() {
         return mimeType;
     }
 
     public File getAttachedFile() {
-        Logger.info(this.filePath);
         return new File(this.filePath);
+    }
+
+    public File getAttachedFileThumbnail() {
+        return new File(this.filePath + "thumb");
+    }
+
+    private Path getThumbnailFilePath() {
+        return Paths.get(getFileTempPath().toString(), "thumb");
     }
 
     private Path getFileTempPath() {

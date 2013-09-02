@@ -11,6 +11,7 @@ import play.mvc.Http.MultipartFormData;
 import play.mvc.Http.MultipartFormData.FilePart;
 import views.html.gifs.index;
 
+import java.io.File;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -52,7 +53,22 @@ public class Gif extends Controller {
 
     public static Result getImage(Long id) {
         Image image = Image.getById(id);
-        return ok(image.getAttachedFile()).as(image.getMimeType());
+        File file = image.getAttachedFile();
+        if (file.exists()) {
+            return ok(file).as(image.getMimeType());
+        } else {
+            return notFound();
+        }
+    }
+
+    public static Result getImageThumbnail(long id) {
+        Image image = Image.getById(id);
+        File file = image.getAttachedFileThumbnail();
+        if (file.exists()) {
+            return ok(image.getAttachedFileThumbnail()).as("image/jpeg");
+        } else {
+            return notFound();
+        }
     }
 
     private static Result saveImageAsync(final Image image, String imageUrl) {
@@ -65,6 +81,7 @@ public class Gif extends Controller {
                         @Override
                         public Result apply(WS.Response response) throws Throwable {
                             image.setAttachedFileContentAsBytes(response.asByteArray(),response.getHeader("Content-Type"));
+                            image.generateThumbnail();
                             image.save();
                             return ok("Hello world");
                         }
