@@ -4,15 +4,19 @@ import models.Image;
 import play.*;
 import play.data.Form;
 import static play.data.Form.*;
+
+import play.libs.Akka;
 import play.libs.F;
 import play.libs.WS;
 import play.mvc.*;
 import play.mvc.Http.MultipartFormData;
 import play.mvc.Http.MultipartFormData.FilePart;
+import scala.concurrent.duration.Duration;
 import views.html.gifs.index;
 
 import java.io.File;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class Gif extends Controller {
     public static Form<Image> imageForm = form(Image.class);
@@ -70,23 +74,31 @@ public class Gif extends Controller {
         }
     }
 
-    private static Result saveImageAsync(final Image image, String imageUrl) {
+    private static Result saveImageAsync(final Image image, final String imageUrl) {
         Logger.info(imageUrl);
         if (imageUrl == null) {
             image.save();
         } else {
-            F.Promise<Result> result = WS.url(imageUrl).get().map(
-                    new F.Function<WS.Response, Result>() {
-                        @Override
-                        public Result apply(WS.Response response) throws Throwable {
-                            image.setAttachedFileContentAsBytes(response.asByteArray(),response.getHeader("Content-Type"));
-                            image.generateThumbnail();
-                            image.save();
-                            return ok("Hello world");
+            Akka.system().scheduler().scheduleOnce(
+                    Duration.create(0, TimeUnit.SECONDS),
+                    new Runnable() {
+                        public void run() {
+                            WS.url(imageUrl).get().map(
+                                    new F.Function<WS.Response, Result>() {
+                                        @Override
+                                        public Result apply(WS.Response response) throws Throwable {
+                                            image.setAttachedFileContentAsBytes(response.asByteArray(),response.getHeader("Content-Type"));
+                                            image.generateThumbnail();
+                                            image.save();
+                                            return ok();
+                                        }
+                                    }
+                            ).get();
                         }
-                    }
+                    }, Akka.system().dispatcher()
             );
-            return async(result);
+
+            return ok();
         }
 
         return redirect(routes.Gif.index());
