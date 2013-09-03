@@ -13,13 +13,12 @@ import views.html.gifs.index;
 
 import java.io.File;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 public class Gif extends Controller {
     public static Form<Image> imageForm = form(Image.class);
 
     public static Result index() {
-        List<Image> imageList = Image.find.all();
+        List<Image> imageList = Image.getAll();
 
         return ok(index.render(imageList));
     }

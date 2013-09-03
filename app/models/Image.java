@@ -10,13 +10,9 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import org.imgscalr.Scalr;
@@ -35,16 +31,10 @@ public class Image extends Model {
     private String mimeType;
 
     private Integer downloads;
-    public static Finder<Long,Image> find = new Finder<Long, Image>(Long.class, Image.class);
+    private static Finder<Long,Image> find = new Finder<Long, Image>(Long.class, Image.class);
 
     public static List<Image> getAll() {
-        List<Image> list = new ArrayList<Image>(20);
-
-        for (int i = 0; i < 20; i++) {
-            list.add(new Image("Hello world", 0));
-        }
-
-        return list;
+        return Image.find.all();
     }
 
     public static Image create() {
@@ -74,22 +64,7 @@ public class Image extends Model {
         try {
             Files.write(path, fileContent);
         } catch(IOException e) {
-
-        } finally {
-        }
-        this.mimeType = contentType;
-        this.filePath = path.toString();
-        return true;
-    }
-
-    public Boolean setAttachedFileContent(String fileContent, String contentType) throws IOException {
-        Path path = getFileTempPath();
-
-        try {
-            Files.write(path, fileContent.getBytes());
-        } catch(IOException e) {
-
-        } finally {
+            Logger.error("Could not write File contents");
         }
         this.mimeType = contentType;
         this.filePath = path.toString();
@@ -148,10 +123,6 @@ public class Image extends Model {
 
     public File getAttachedFileThumbnail() {
         return new File(this.filePath + "thumb");
-    }
-
-    private Path getThumbnailFilePath() {
-        return Paths.get(getFileTempPath().toString(), "thumb");
     }
 
     private Path getFileTempPath() {
